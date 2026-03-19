@@ -1,12 +1,15 @@
-import { NestFactory, HttpAdapterHost } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe, Logger, LogLevel } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bufferLogs: true, // buffer logs until custom logger is attached
-  });
+  const isProd = process.env.NODE_ENV === 'production';
+  const logLevels: LogLevel[] = isProd
+    ? ['log', 'warn', 'error']
+    : ['log', 'warn', 'error', 'debug', 'verbose'];
+
+  const app = await NestFactory.create(AppModule, { logger: logLevels });
 
   const logger = new Logger('Bootstrap');
 
