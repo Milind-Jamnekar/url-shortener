@@ -1,10 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true, // buffer logs until custom logger is attached
+  });
+
+  const logger = new Logger('Bootstrap');
 
   // Security headers
   app.use(helmet());
@@ -12,7 +16,7 @@ async function bootstrap() {
   // Auto-validate and transform incoming DTOs
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,       // strip unknown fields
+      whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
     }),
@@ -20,7 +24,7 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`Application running on port ${port}`);
+  logger.log(`Application is running on port ${port}`);
 }
 
 bootstrap();
