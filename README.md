@@ -6,6 +6,7 @@ A production-grade URL shortener built with NestJS and MongoDB.
 
 - **Framework:** NestJS (TypeScript)
 - **Database:** MongoDB (Mongoose)
+- **Cache:** Redis (cache-aside pattern)
 - **Runtime:** Node.js 20
 - **Container:** Docker + Docker Compose
 
@@ -59,10 +60,12 @@ GET /:code
 | `PORT`        | Port the app listens on            | `3000`                               |
 | `MONGODB_URI` | MongoDB connection string          | `mongodb://localhost:27017/url-shortener` |
 | `APP_URL`     | Base URL used to construct short URLs | `http://localhost:3000`           |
+| `REDIS_URL`   | Redis connection string            | `redis://localhost:6379`             |
+| `CACHE_TTL_SECONDS` | How long to cache redirects  | `86400` (24h)                        |
 
 ## Roadmap
 
-- [ ] **Redis caching** — cache redirects to avoid DB hit on every request
+- [x] **Redis caching** — cache redirects to avoid DB hit on every request
 - [ ] **Click analytics** — track total clicks, referrers, and countries per short URL
 - [ ] **Custom slugs** — let users define their own short code (e.g. `/my-link`)
 - [ ] **TTL / expiry** — auto-expire links after a set duration
