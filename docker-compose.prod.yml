@@ -1,0 +1,51 @@
+services:
+  app:
+    # Image is built and pushed to GHCR by GitHub Actions — set APP_IMAGE in .env on the server
+    # e.g. APP_IMAGE=ghcr.io/your-github-username/url-shortener:latest
+    image: ${APP_IMAGE}
+    env_file: .env
+    ports:
+      # Only expose to localhost — Nginx on the host proxies to this
+      - "127.0.0.1:3000:3000"
+    networks:
+      - internal
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  redis_data:

@@ -94,6 +94,40 @@ GET /urls/:code/stats
 - [ ] **API key auth** — restrict access to authenticated users
 - [ ] **Dashboard** — view and manage all your shortened URLs
 
+## Deployment (Hetzner + GitHub Actions)
+
+CI/CD runs automatically on every push to `main` — builds the Docker image, pushes to GHCR, and deploys to the server.
+
+### GitHub Secrets required
+
+| Secret | Description |
+|--------|-------------|
+| `DEPLOY_HOST` | Server IP address |
+| `DEPLOY_USER` | SSH deploy user (e.g. `deploy`) |
+| `DEPLOY_SSH_KEY` | Private SSH key for the deploy user |
+
+### One-time server setup
+
+```bash
+# Install Nginx + Certbot
+apt install -y nginx certbot python3-certbot-nginx
+
+# Get SSL certificate
+certbot --nginx -d tinyurl.milindjamnekar.dev
+
+# Copy Nginx config
+cp nginx/tinyurl.milindjamnekar.dev.conf /etc/nginx/sites-available/tinyurl.milindjamnekar.dev
+ln -s /etc/nginx/sites-available/tinyurl.milindjamnekar.dev /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+
+# Create app directory and .env
+mkdir -p /opt/url-shortener
+cp .env.example /opt/url-shortener/.env
+# Edit .env — set APP_IMAGE=ghcr.io/your-github-username/url-shortener:latest
+```
+
+After that, every push to `main` deploys automatically.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
