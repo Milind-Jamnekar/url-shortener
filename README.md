@@ -88,7 +88,7 @@ GET /urls/:code/stats
 - [x] **Click analytics** — track total clicks per short URL, exposed via stats endpoint
 - [x] **Custom slugs** — let users define their own short code (e.g. `/my-link`)
 - [x] **TTL / expiry** — auto-expire links after a set duration, MongoDB TTL index handles cleanup
-- [ ] **Rate limiting** — protect the shorten endpoint from abuse
+- [x] **Rate limiting** — 10 req/min on shorten, 60 req/min on all other endpoints
 - [ ] **Duplicate detection** — return existing short code if URL was already shortened
 - [ ] **QR code generation** — generate a QR code for any short URL
 - [ ] **API key auth** — restrict access to authenticated users
