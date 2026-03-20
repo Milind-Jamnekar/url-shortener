@@ -16,6 +16,9 @@ export class Url {
 
   @Prop()
   lastClickedAt: Date;
+
+  @Prop({ index: { expireAfterSeconds: 0 } })
+  expiresAt: Date;
 }
 
 export const UrlSchema = SchemaFactory.createForClass(Url);

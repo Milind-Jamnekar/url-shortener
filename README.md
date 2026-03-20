@@ -40,6 +40,8 @@ Content-Type: application/json
 { "url": "https://www.example.com" }
 // or with a custom slug:
 { "url": "https://www.example.com", "slug": "my-link" }
+// or with expiry (in seconds):
+{ "url": "https://www.example.com", "expiresInSeconds": 86400 }
 ```
 
 ```json
@@ -85,7 +87,7 @@ GET /urls/:code/stats
 - [x] **Redis caching** — cache redirects to avoid DB hit on every request
 - [x] **Click analytics** — track total clicks per short URL, exposed via stats endpoint
 - [x] **Custom slugs** — let users define their own short code (e.g. `/my-link`)
-- [ ] **TTL / expiry** — auto-expire links after a set duration
+- [x] **TTL / expiry** — auto-expire links after a set duration, MongoDB TTL index handles cleanup
 - [ ] **Rate limiting** — protect the shorten endpoint from abuse
 - [ ] **Duplicate detection** — return existing short code if URL was already shortened
 - [ ] **QR code generation** — generate a QR code for any short URL

@@ -1,5 +1,12 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  GoneException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cache } from "cache-manager";
@@ -20,6 +27,7 @@ export class UrlService {
     private readonly config: ConfigService,
   ) {
     this.appUrl = this.config.getOrThrow<string>("APP_URL");
+    // CACHE_TTL_SECONDS is in seconds (default 86400 = 24h) — cache-manager expects milliseconds
     this.cacheTtlMs =
       this.config.get<number>("CACHE_TTL_SECONDS", 86400) * 1000;
   }
@@ -39,8 +47,15 @@ export class UrlService {
       shortCode = nanoid(7);
     }
 
-    await this.urlModel.create({ originalUrl: dto.url, shortCode });
-    this.logger.log(`Created short URL — code: ${shortCode} → ${dto.url}`);
+    // Date.now() is in milliseconds, expiresInSeconds is in seconds — multiply by 1000 to convert
+    const expiresAt = dto.expiresInSeconds
+      ? new Date(Date.now() + dto.expiresInSeconds * 1000)
+      : undefined;
+
+    await this.urlModel.create({ originalUrl: dto.url, shortCode, expiresAt });
+    this.logger.log(
+      `Created short URL — code: ${shortCode} → ${dto.url}${expiresAt ? ` (expires: ${expiresAt.toISOString()})` : ""}`,
+    );
 
     return {
       shortCode,
@@ -72,6 +87,11 @@ export class UrlService {
     if (!record) {
       this.logger.warn(`Short code not found — ${shortCode}`);
       throw new NotFoundException(`Short URL not found`);
+    }
+
+    if (record.expiresAt && record.expiresAt < new Date()) {
+      this.logger.warn(`Short code expired — ${shortCode}`);
+      throw new GoneException(`Short URL has expired`);
     }
 
     // 3. Populate cache for next time
