@@ -44,6 +44,23 @@ export class UrlService {
       }
       shortCode = dto.slug;
     } else {
+      // Check if this URL was already shortened and hasn't expired
+      const duplicate = await this.urlModel
+        .findOne({
+          originalUrl: dto.url,
+          $or: [{ expiresAt: { $exists: false } }, { expiresAt: { $gt: new Date() } }],
+        })
+        .lean()
+        .exec();
+
+      if (duplicate) {
+        this.logger.log(`Duplicate detected — returning existing code: ${duplicate.shortCode}`);
+        return {
+          shortCode: duplicate.shortCode,
+          shortUrl: `${this.appUrl}/${duplicate.shortCode}`,
+        };
+      }
+
       shortCode = nanoid(7);
     }
 
