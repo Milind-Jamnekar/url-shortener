@@ -6,7 +6,8 @@ services:
     env_file: .env
     ports:
       # Only expose to localhost — Nginx on the host proxies to this
-      - "127.0.0.1:3000:3000"
+      # Using 3001 since 3000 is used by another app on this server
+      - "127.0.0.1:3001:3000"
     networks:
       - internal
     depends_on:
