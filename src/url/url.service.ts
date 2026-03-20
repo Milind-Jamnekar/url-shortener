@@ -1,5 +1,5 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cache } from "cache-manager";
@@ -27,9 +27,19 @@ export class UrlService {
   async shorten(
     dto: CreateUrlDto,
   ): Promise<{ shortUrl: string; shortCode: string }> {
-    const shortCode = nanoid(7);
-    await this.urlModel.create({ originalUrl: dto.url, shortCode });
+    let shortCode: string;
 
+    if (dto.slug) {
+      const existing = await this.urlModel.exists({ shortCode: dto.slug });
+      if (existing) {
+        throw new ConflictException(`Slug "${dto.slug}" is already taken`);
+      }
+      shortCode = dto.slug;
+    } else {
+      shortCode = nanoid(7);
+    }
+
+    await this.urlModel.create({ originalUrl: dto.url, shortCode });
     this.logger.log(`Created short URL — code: ${shortCode} → ${dto.url}`);
 
     return {

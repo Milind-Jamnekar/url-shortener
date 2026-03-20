@@ -38,12 +38,14 @@ POST /urls
 Content-Type: application/json
 
 { "url": "https://www.example.com" }
+// or with a custom slug:
+{ "url": "https://www.example.com", "slug": "my-link" }
 ```
 
 ```json
 {
-  "shortCode": "abc1234",
-  "shortUrl": "http://localhost:3000/abc1234"
+  "shortCode": "my-link",
+  "shortUrl": "http://localhost:3000/my-link"
 }
 ```
 
@@ -51,6 +53,21 @@ Content-Type: application/json
 ```http
 GET /:code
 → 301 redirect to original URL
+```
+
+### URL Stats
+```http
+GET /urls/:code/stats
+```
+
+```json
+{
+  "shortCode": "abc1234",
+  "originalUrl": "https://www.example.com",
+  "clicks": 42,
+  "lastClickedAt": "2026-03-20T10:00:00.000Z",
+  "createdAt": "2026-03-19T08:00:00.000Z"
+}
 ```
 
 ## Environment Variables
@@ -66,8 +83,8 @@ GET /:code
 ## Roadmap
 
 - [x] **Redis caching** — cache redirects to avoid DB hit on every request
-- [ ] **Click analytics** — track total clicks, referrers, and countries per short URL
-- [ ] **Custom slugs** — let users define their own short code (e.g. `/my-link`)
+- [x] **Click analytics** — track total clicks per short URL, exposed via stats endpoint
+- [x] **Custom slugs** — let users define their own short code (e.g. `/my-link`)
 - [ ] **TTL / expiry** — auto-expire links after a set duration
 - [ ] **Rate limiting** — protect the shorten endpoint from abuse
 - [ ] **Duplicate detection** — return existing short code if URL was already shortened
