@@ -12,6 +12,11 @@ export class UrlController {
     return this.urlService.shorten(dto);
   }
 
+  @Get('urls/:code/stats')
+  getStats(@Param('code') code: string) {
+    return this.urlService.getStats(code);
+  }
+
   @Get(':code')
   @Redirect()
   async redirect(@Param('code') code: string) {
