@@ -1,4 +1,5 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import * as QRCode from 'qrcode';
 import {
   ConflictException,
   GoneException,
@@ -140,6 +141,16 @@ export class UrlService {
         `Failed to record click for ${shortCode}: ${(err as Error).message}`,
       );
     }
+  }
+
+  async getQrCode(shortCode: string): Promise<Buffer> {
+    const record = await this.urlModel.exists({ shortCode });
+    if (!record) {
+      throw new NotFoundException(`Short URL not found`);
+    }
+
+    const shortUrl = `${this.appUrl}/${shortCode}`;
+    return QRCode.toBuffer(shortUrl, { width: 300 });
   }
 
   async getStats(shortCode: string): Promise<{

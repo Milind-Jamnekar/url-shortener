@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Redirect } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpCode, Param, Post, Redirect, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { UrlService } from './url.service';
@@ -18,6 +19,17 @@ export class UrlController {
   @ApiResponse({ status: 429, description: 'Too many requests' })
   shorten(@Body() dto: CreateUrlDto) {
     return this.urlService.shorten(dto);
+  }
+
+  @Get('urls/:code/qr')
+  @ApiOperation({ summary: 'Get QR code for a short URL' })
+  @ApiParam({ name: 'code', example: 'abc1234' })
+  @ApiResponse({ status: 200, description: 'Returns a PNG QR code image' })
+  @ApiResponse({ status: 404, description: 'Short URL not found' })
+  async getQrCode(@Param('code') code: string, @Res() res: Response) {
+    const buffer = await this.urlService.getQrCode(code);
+    res.setHeader('Content-Type', 'image/png');
+    res.send(buffer);
   }
 
   @Get('urls/:code/stats')

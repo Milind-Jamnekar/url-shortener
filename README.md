@@ -90,7 +90,7 @@ GET /urls/:code/stats
 - [x] **TTL / expiry** — auto-expire links after a set duration, MongoDB TTL index handles cleanup
 - [x] **Rate limiting** — 10 req/min on shorten, 60 req/min on all other endpoints
 - [x] **Duplicate detection** — return existing short code if URL was already shortened (skipped if expired)
-- [ ] **QR code generation** — generate a QR code for any short URL
+- [x] **QR code generation** — generate a PNG QR code for any short URL via `GET /urls/:code/qr`
 - [ ] **API key auth** — restrict access to authenticated users
 - [ ] **Dashboard** — view and manage all your shortened URLs
 
