@@ -33,6 +33,7 @@ pnpm start:dev
 ## API
 
 ### Shorten a URL
+
 ```http
 POST /urls
 Content-Type: application/json
@@ -52,12 +53,14 @@ Content-Type: application/json
 ```
 
 ### Redirect
+
 ```http
 GET /:code
 → 301 redirect to original URL
 ```
 
 ### URL Stats
+
 ```http
 GET /urls/:code/stats
 ```
@@ -74,13 +77,13 @@ GET /urls/:code/stats
 
 ## Environment Variables
 
-| Variable      | Description                        | Default                              |
-|---------------|------------------------------------|--------------------------------------|
-| `PORT`        | Port the app listens on            | `3000`                               |
-| `MONGODB_URI` | MongoDB connection string          | `mongodb://localhost:27017/url-shortener` |
-| `APP_URL`     | Base URL used to construct short URLs | `http://localhost:3000`           |
-| `REDIS_URL`   | Redis connection string            | `redis://localhost:6379`             |
-| `CACHE_TTL_SECONDS` | How long to cache redirects  | `86400` (24h)                        |
+| Variable            | Description                           | Default                                   |
+| ------------------- | ------------------------------------- | ----------------------------------------- |
+| `PORT`              | Port the app listens on               | `3000`                                    |
+| `MONGODB_URI`       | MongoDB connection string             | `mongodb://localhost:27017/url-shortener` |
+| `APP_URL`           | Base URL used to construct short URLs | `http://localhost:3000`                   |
+| `REDIS_URL`         | Redis connection string               | `redis://localhost:6379`                  |
+| `CACHE_TTL_SECONDS` | How long to cache redirects           | `86400` (24h)                             |
 
 ## Roadmap
 
@@ -91,8 +94,6 @@ GET /urls/:code/stats
 - [x] **Rate limiting** — 10 req/min on shorten, 60 req/min on all other endpoints
 - [x] **Duplicate detection** — return existing short code if URL was already shortened (skipped if expired)
 - [x] **QR code generation** — generate a PNG QR code for any short URL via `GET /urls/:code/qr`
-- [ ] **API key auth** — restrict access to authenticated users
-- [ ] **Dashboard** — view and manage all your shortened URLs
 
 ## Deployment (Hetzner + GitHub Actions)
 
@@ -100,10 +101,10 @@ CI/CD runs automatically on every push to `main` — builds the Docker image, pu
 
 ### GitHub Secrets required
 
-| Secret | Description |
-|--------|-------------|
-| `DEPLOY_HOST` | Server IP address |
-| `DEPLOY_USER` | SSH deploy user (e.g. `deploy`) |
+| Secret           | Description                         |
+| ---------------- | ----------------------------------- |
+| `DEPLOY_HOST`    | Server IP address                   |
+| `DEPLOY_USER`    | SSH deploy user (e.g. `deploy`)     |
 | `DEPLOY_SSH_KEY` | Private SSH key for the deploy user |
 
 ### One-time server setup
